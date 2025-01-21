@@ -11,7 +11,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    touch-action: none;
 }
 
 #container {
@@ -26,7 +25,6 @@ body {
 
 .heart {
     user-select: none;
-    pointer-events: none;
     position: absolute;
     animation-fill-mode: forwards;
     font-size: 0.5in;
