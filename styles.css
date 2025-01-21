@@ -42,6 +42,10 @@ body {
     line-height: 1in;
 }
 
+.grayscale {
+    filter: grayscale(1);
+}
+
 @media (prefers-color-scheme: light) {
     body {
         background-color: white;

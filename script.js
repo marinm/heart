@@ -1,4 +1,6 @@
-const webSocket = new WebSocket("https://marinm.net/broadcast");
+let webSocket = null;
+
+connect();
 
 const container = document.getElementById("container");
 const bigHeart = document.getElementById("big-heart");
@@ -6,6 +8,13 @@ const bigHeart = document.getElementById("big-heart");
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
 bigHeart.addEventListener("click", () => {
+	if (webSocket?.readyState == WebSocket.CLOSED) {
+		connect();
+		return;
+	}
+	if (webSocket?.readyState !== WebSocket.OPEN) {
+		return;
+	}
 	console.log("send");
 	webSocket.send(randomAnimation());
 });
@@ -24,18 +33,24 @@ function newHeart(animation) {
     heart.onanimationend = ({ target }) => target.remove();
 }
 
-webSocket.addEventListener("open", () => {
-    console.log("open");
-});
+function connect() {
+	webSocket = new WebSocket("https://marinm.net/broadcast");
 
-webSocket.addEventListener("close", () => {
-    console.log("close");
-});
+	webSocket.addEventListener("open", () => {
+		console.log("open");
+		bigHeart.classList.remove('grayscale');
+	});
 
-webSocket.addEventListener("message", (event) => {
-	const animation = String(event.data);
+	webSocket.addEventListener("close", () => {
+		console.log("close");
+		bigHeart.classList.add('grayscale');
+	});
 
-	if (animations.includes(animation)) {
-		newHeart(animation);
-	}
-});
+	webSocket.addEventListener("message", (event) => {
+		const animation = String(event.data);
+	
+		if (animations.includes(animation)) {
+			newHeart(animation);
+		}
+	});
+}
