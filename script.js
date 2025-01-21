@@ -7,16 +7,30 @@ const bigHeart = document.getElementById("big-heart");
 
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
+let timeoutId = null;
+
+function growHeart() {
+    bigHeart.classList.add("tapped");
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+        bigHeart.classList.remove("tapped");
+    }, 250);
+}
+
 bigHeart.addEventListener("click", () => {
-	if (webSocket?.readyState == WebSocket.CLOSED) {
-		connect();
-		return;
-	}
-	if (webSocket?.readyState !== WebSocket.OPEN) {
-		return;
-	}
-	console.log("send");
-	webSocket.send(randomAnimation());
+	growHeart();
+
+    if (webSocket == null || webSocket.readyState == WebSocket.CLOSED) {
+        connect();
+        return;
+    }
+    if (webSocket?.readyState !== WebSocket.OPEN) {
+        return;
+    }
+    console.log("send");
+    webSocket.send(randomAnimation());
 });
 
 function randomAnimation() {
@@ -34,23 +48,23 @@ function newHeart(animation) {
 }
 
 function connect() {
-	webSocket = new WebSocket("https://marinm.net/broadcast");
+    webSocket = new WebSocket("https://marinm.net/broadcast");
 
-	webSocket.addEventListener("open", () => {
-		console.log("open");
-		bigHeart.classList.remove('grayscale');
-	});
+    webSocket.addEventListener("open", () => {
+        console.log("open");
+        bigHeart.classList.remove("grayscale");
+    });
 
-	webSocket.addEventListener("close", () => {
-		console.log("close");
-		bigHeart.classList.add('grayscale');
-	});
+    webSocket.addEventListener("close", () => {
+        console.log("close");
+        bigHeart.classList.add("grayscale");
+    });
 
-	webSocket.addEventListener("message", (event) => {
-		const animation = String(event.data);
-	
-		if (animations.includes(animation)) {
-			newHeart(animation);
-		}
-	});
+    webSocket.addEventListener("message", (event) => {
+        const animation = String(event.data);
+
+        if (animations.includes(animation)) {
+            newHeart(animation);
+        }
+    });
 }
