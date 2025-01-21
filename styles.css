@@ -14,6 +14,7 @@ body {
 }
 
 #container {
+    pointer-events: none;
     user-select: none;
     position: absolute;
     width: 100%;
