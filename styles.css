@@ -2,6 +2,8 @@
     box-sizing: border-box;
 }
 body {
+    user-select: none;
+    pointer-events: none;
     background-color: black;
     width: 100vw;
     height: 100vh;
@@ -10,31 +12,34 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    touch-action: none;
 }
 
 #container {
+    user-select: none;
+    pointer-events: none;
     position: absolute;
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    pointer-events: none;
 }
 
 .heart {
+    user-select: none;
+    pointer-events: none;
     position: absolute;
     animation-fill-mode: forwards;
     font-size: 0.5in;
     line-height: 0.5in;
     cursor: default;
-    user-select: none;
 }
 
 #big-heart {
+    user-select: none;
     font-size: 1in;
     cursor: default;
-    user-select: none;
     line-height: 1in;
 }
 
