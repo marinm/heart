@@ -1,10 +1,10 @@
 * {
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+    touch-action: none;
 }
 body {
     user-select: none;
-    touch-action: none;
     background-color: black;
     width: 100vw;
     height: 100vh;
