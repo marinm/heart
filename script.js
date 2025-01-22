@@ -1,3 +1,5 @@
+const SERVER_URL = "https://marinm.net/broadcast?channel=hearts";
+
 let webSocket = null;
 let connectedAt = null;
 let tappedAt = null;
@@ -51,7 +53,7 @@ function newHeart(animation) {
 }
 
 function connect() {
-    webSocket = new WebSocket("https://marinm.net/broadcast");
+    webSocket = new WebSocket(SERVER_URL);
 
     webSocket.addEventListener("open", () => {
         console.log("open");
