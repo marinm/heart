@@ -1,4 +1,6 @@
 let webSocket = null;
+let connectedAt = null;
+let tappedAt = null;
 
 connect();
 
@@ -20,7 +22,8 @@ function growHeart() {
 }
 
 bigHeart.addEventListener("click", () => {
-	growHeart();
+    tappedAt = Date.now();
+    growHeart();
 
     if (webSocket == null || webSocket.readyState == WebSocket.CLOSED) {
         connect();
@@ -52,11 +55,19 @@ function connect() {
 
     webSocket.addEventListener("open", () => {
         console.log("open");
+        connectedAt = Date.now();
         bigHeart.classList.remove("grayscale");
     });
 
     webSocket.addEventListener("close", () => {
         console.log("close");
+        const now = Date.now();
+        const tappedMessage = tappedAt
+            ? `or ${now - tappedAt} ms since tapped`
+            : "not tapped";
+        console.log(
+            `connection lasted ${now - connectedAt} ms, ${tappedMessage}`
+        );
         bigHeart.classList.add("grayscale");
     });
 
