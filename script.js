@@ -1,4 +1,5 @@
-const SERVER_URL = "https://marinm.net/broadcast?channel=hearts";
+const channel = (new URL(window.location)).searchParams.get('channel') ?? '';
+const SERVER_URL = `https://marinm.net/broadcast?channel=${channel}`;
 
 let webSocket = null;
 let connectedAt = null;
