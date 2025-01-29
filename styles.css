@@ -26,12 +26,14 @@ body {
     align-items: center;
 }
 
-.heart {
+.small-heart {
     user-select: none;
     position: absolute;
     animation-fill-mode: forwards;
     font-size: 0.5in;
     line-height: 0.5in;
+    fill: red;
+    width: 0.5in;
     cursor: default;
 }
 
@@ -40,7 +42,9 @@ body {
     font-size: 1in;
     cursor: default;
     line-height: 1in;
-    transition: transform 0.25s linear, filter 0.50s ease-in;
+    width: 1in;
+    fill: red;
+    transition: transform 0.25s linear, filter 0.5s ease-in;
 }
 
 #big-heart.tapped {
@@ -53,7 +57,7 @@ body {
 
 @keyframes grow {
     0% {
-        scale: 1.0;
+        scale: 1;
     }
 
     50% {
@@ -61,7 +65,7 @@ body {
     }
 
     100% {
-        scale: 1.0;
+        scale: 1;
     }
 }
 

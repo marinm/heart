@@ -1,4 +1,4 @@
-const channel = (new URL(window.location)).searchParams.get('channel') ?? '';
+const channel = new URL(window.location).searchParams.get("channel") ?? "";
 const SERVER_URL = `https://marinm.net/broadcast?channel=${channel}`;
 
 let webSocket = null;
@@ -44,9 +44,9 @@ function randomAnimation() {
 }
 
 function newHeart(animation) {
-    const heart = document.createElement("div");
-    heart.classList.add("heart");
-    heart.textContent = "❤️";
+    const heart = bigHeart.cloneNode(true);
+    heart.id = "";
+    heart.classList.add("small-heart");
     heart.style.animationName = animation;
     heart.style.animationDuration = "1500ms";
     container.appendChild(heart);
