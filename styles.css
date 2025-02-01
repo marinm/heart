@@ -1,7 +1,9 @@
 * {
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
     touch-action: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
 }
 body {
     user-select: none;
