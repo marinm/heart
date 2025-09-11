@@ -36,8 +36,16 @@ bigHeart.addEventListener("click", () => {
         return;
     }
     console.log("send");
-    webSocket.send(randomAnimation());
+
+    const animationName = randomAnimation();
+    const timestamp = now();
+
+    webSocket.send(`${timestamp} ${animationName}`);
 });
+
+function now() {
+    return Date.now();
+}
 
 function randomAnimation() {
     return animations[Math.floor(Math.random() * animations.length)];
@@ -77,8 +85,16 @@ function connect() {
     webSocket.addEventListener("message", (event) => {
         const animation = String(event.data);
 
-        if (animations.includes(animation)) {
-            newHeart(animation);
+        const message = event.data;
+
+        const [timestamp, animationName] = message.split(" ");
+
+        const latency = now() - timestamp;
+
+        console.log(latency);
+
+        if (animations.includes(animationName)) {
+            newHeart(animationName);
         }
     });
 }
