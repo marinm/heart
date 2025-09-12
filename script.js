@@ -10,6 +10,8 @@ connect();
 const container = document.getElementById("container");
 const bigHeart = document.getElementById("big-heart");
 
+const statsDiv = document.querySelector('#stats');
+
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
 let timeoutId = null;
@@ -21,7 +23,8 @@ function growHeart() {
     }
     timeoutId = setTimeout(() => {
         bigHeart.classList.remove("tapped");
-    }, 250);
+        statsDiv.innerHTML = '';
+    }, 555);
 }
 
 bigHeart.addEventListener("click", () => {
@@ -91,7 +94,7 @@ function connect() {
 
         const latency = now() - timestamp;
 
-        console.log(latency);
+        statsDiv.innerHTML = `${latency}`;
 
         if (animations.includes(animationName)) {
             newHeart(animationName);
