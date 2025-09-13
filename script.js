@@ -5,6 +5,10 @@ let webSocket = null;
 let connectedAt = null;
 let tappedAt = null;
 
+let sequenceNumber = 0;
+
+const smallHeartsHere = new Set([]);
+
 connect();
 
 const bigHeart = document.getElementById("big-heart");
@@ -20,10 +24,7 @@ function growHeart() {
     if (timeoutId) {
         clearTimeout(timeoutId);
     }
-    timeoutId = setTimeout(() => {
-        bigHeart.classList.remove("tapped");
-        statsLayer.innerHTML = '';
-    }, 555);
+    timeoutId = setTimeout(() => bigHeart.classList.remove("tapped"), 555);
 }
 
 bigHeart.addEventListener("click", () => {
@@ -53,14 +54,37 @@ function randomAnimation() {
     return animations[Math.floor(Math.random() * animations.length)];
 }
 
-function newHeart(animation) {
+function newHeart(animation, latency) {
+    sequenceNumber++;
+
+    const ownSequenceNumber = sequenceNumber;
+
+    smallHeartsHere.add(ownSequenceNumber);
+
+    showStats(latency);
+
     const heart = bigHeart.cloneNode(true);
     heart.id = "";
     heart.classList.add("small-heart");
     heart.style.animationName = animation;
     heart.style.animationDuration = "1500ms";
     smallHeartsLayer.appendChild(heart);
-    heart.onanimationend = ({ target }) => target.remove();
+    heart.onanimationend = ({ target }) => {
+        target.remove();
+        smallHeartsHere.delete(ownSequenceNumber)
+        clearStats();
+    };
+}
+
+function showStats(latency) {
+    statsLayer.classList.remove('transparent');
+    statsLayer.innerHTML = `${latency}`;
+}
+
+function clearStats() {
+    if (smallHeartsHere.size === 0) {
+        statsLayer.classList.add('transparent');
+    }
 }
 
 function connect() {
@@ -85,18 +109,14 @@ function connect() {
     });
 
     webSocket.addEventListener("message", (event) => {
-        const animation = String(event.data);
-
-        const message = event.data;
+        const message = String(event.data);
 
         const [timestamp, animationName] = message.split(" ");
 
         const latency = now() - timestamp;
 
-        statsLayer.innerHTML = `${latency}`;
-
         if (animations.includes(animationName)) {
-            newHeart(animationName);
+            newHeart(animationName, latency);
         }
     });
 }

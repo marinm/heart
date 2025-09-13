@@ -27,11 +27,11 @@ body {
     height: 1em;
     color: #666;
     font-family: monospace;
-    transition: color 250ms ease-in-out;
+    transition: opacity 250ms linear;
 }
 
-#stats-layer:empty {
-    color: black;
+.transparent {
+    opacity: 0;
 }
 
 #small-hearts-layer {
