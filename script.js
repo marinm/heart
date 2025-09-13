@@ -7,10 +7,9 @@ let tappedAt = null;
 
 connect();
 
-const container = document.getElementById("container");
 const bigHeart = document.getElementById("big-heart");
-
-const statsDiv = document.querySelector('#stats');
+const smallHeartsLayer = document.getElementById("small-hearts-layer");
+const statsLayer = document.querySelector("#stats-layer");
 
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
@@ -23,7 +22,7 @@ function growHeart() {
     }
     timeoutId = setTimeout(() => {
         bigHeart.classList.remove("tapped");
-        statsDiv.innerHTML = '';
+        statsLayer.innerHTML = '';
     }, 555);
 }
 
@@ -60,7 +59,7 @@ function newHeart(animation) {
     heart.classList.add("small-heart");
     heart.style.animationName = animation;
     heart.style.animationDuration = "1500ms";
-    container.appendChild(heart);
+    smallHeartsLayer.appendChild(heart);
     heart.onanimationend = ({ target }) => target.remove();
 }
 
@@ -94,7 +93,7 @@ function connect() {
 
         const latency = now() - timestamp;
 
-        statsDiv.innerHTML = `${latency}`;
+        statsLayer.innerHTML = `${latency}`;
 
         if (animations.includes(animationName)) {
             newHeart(animationName);

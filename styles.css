@@ -19,18 +19,22 @@ body {
     gap: 1em;
 }
 
-#stats {
+#stats-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 1em;
     height: 1em;
     color: #666;
     font-family: monospace;
     transition: color 250ms ease-in-out;
 }
 
-#stats:empty {
+#stats-layer:empty {
     color: black;
 }
 
-#container {
+#small-hearts-layer {
     pointer-events: none;
     user-select: none;
     position: absolute;
