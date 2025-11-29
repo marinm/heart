@@ -113,9 +113,14 @@ function connect() {
     });
 
     webSocket.addEventListener("message", (event) => {
-        const message = JSON.parse(String(event.data)).data;
+        const message = JSON.parse(String(event.data));
 
-        const [timestamp, animationName] = message.split(" ");
+        if (message.from === "server") {
+            console.log("connectionId", message.data.connectionId);
+            return;
+        }
+
+        const [timestamp, animationName] = message.data.split(" ");
 
         const latency = now() - timestamp;
 
