@@ -43,7 +43,11 @@ bigHeart.addEventListener("click", () => {
     const animationName = randomAnimation();
     const timestamp = now();
 
-    webSocket.send(`${timestamp} ${animationName}`);
+    const message = {
+        data: `${timestamp} ${animationName}`,
+    };
+
+    webSocket.send(JSON.stringify(message));
 });
 
 function now() {
@@ -109,7 +113,7 @@ function connect() {
     });
 
     webSocket.addEventListener("message", (event) => {
-        const message = String(event.data);
+        const message = JSON.parse(String(event.data)).data;
 
         const [timestamp, animationName] = message.split(" ");
 
