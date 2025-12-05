@@ -4,6 +4,47 @@ import { useBroadcastWebSocket } from "./hooks/useBroadcastWebSocket";
 import { useTimeoutState } from "./hooks/useTimeoutState";
 import classNames from "classnames";
 
+type ServerMessage = {
+  from: string;
+  data: {
+    timestamp: number;
+    animation: string;
+  };
+};
+
+const animations = ["float-1", "float-2", "float-3", "float-4"];
+
+function randomAnimation() {
+  return animations[Math.floor(Math.random() * animations.length)];
+}
+
+function parseRawMessage(rawMessage: unknown): null | ServerMessage {
+  let message = null;
+  try {
+    message = JSON.parse(String(rawMessage));
+  } catch {
+    message = null;
+  }
+
+  if (
+    message !== null &&
+    typeof message === "object" &&
+    "from" in message &&
+    typeof message.from === "string" &&
+    "data" in message &&
+    typeof message.data === "object" &&
+    "timestamp" in message.data &&
+    typeof message.data.timestamp === "number" &&
+    "animation" in message.data &&
+    typeof message.data.animation === "string" &&
+    animations.includes(message.data.animation)
+  ) {
+    return message;
+  }
+
+  return null;
+}
+
 function App() {
   const webSocket = useBroadcastWebSocket();
   const [tapped, setTappedWithTimeout] = useTimeoutState(false, 555);
@@ -13,7 +54,11 @@ function App() {
   const SERVER_URL = `http://localhost:3001/broadcast?channel=${channel}`;
 
   const onMessage = useCallback((rawMessage: unknown) => {
-    console.log("rawMessage", rawMessage);
+    const message = parseRawMessage(rawMessage);
+    console.log(message);
+
+    // const latency = Date.now() - message.data.timestamp;
+    // newHeart(animationName, latency);
   }, []);
 
   useEffect(() => webSocket.onMessage(onMessage), [webSocket, onMessage]);
