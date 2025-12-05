@@ -22,6 +22,19 @@ function App() {
 
   function tap() {
     setTappedWithTimeout(true);
+
+    if (webSocket.readyState == WebSocket.CLOSED) {
+      webSocket.open(SERVER_URL);
+      return;
+    }
+
+    if (webSocket.readyState !== WebSocket.OPEN) {
+      return;
+    }
+
+    webSocket.send({
+      data: { timestamp: Date.now(), animation: randomAnimation() },
+    });
   }
 
   return (
