@@ -2,6 +2,7 @@ import "./App.css";
 import { useEffect, useCallback } from "react";
 import { useBroadcastWebSocket } from "./hooks/useBroadcastWebSocket";
 import { useTimeoutState } from "./hooks/useTimeoutState";
+import classNames from "classnames";
 
 function App() {
   const webSocket = useBroadcastWebSocket();
@@ -30,11 +31,10 @@ function App() {
           id="big-heart"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
-          className={
-            (webSocket.readyState !== WebSocket.OPEN ? "grayscale" : "") +
-            " " +
-            (tapped ? "tapped" : "")
-          }
+          className={classNames({
+            grayscale: webSocket.readyState !== WebSocket.OPEN,
+            tapped: tapped,
+          })}
           onClick={tap}
         >
           {/* <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--> */}
