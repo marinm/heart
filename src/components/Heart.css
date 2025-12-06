@@ -1,14 +1,3 @@
-.small-heart {
-  user-select: none;
-  position: absolute;
-  animation-fill-mode: forwards;
-  font-size: 0.5in;
-  line-height: 0.5in;
-  fill: red;
-  width: 0.5in;
-  cursor: default;
-}
-
 .big-heart {
   user-select: none;
   font-size: 1in;
@@ -19,6 +8,17 @@
   transition:
     transform 0.25s linear,
     filter 0.5s ease-in;
+}
+
+.small-heart {
+  user-select: none;
+  position: absolute;
+  animation-fill-mode: forwards;
+  font-size: 0.5in;
+  line-height: 0.5in;
+  fill: red;
+  width: 0.5in;
+  cursor: default;
 }
 
 .big-heart.tapped {
@@ -41,6 +41,26 @@
   100% {
     scale: 1;
   }
+}
+
+.float-1 {
+  animation-name: float-1;
+  animation-duration: 1500ms;
+}
+
+.float-2 {
+  animation-name: float-2;
+  animation-duration: 1500ms;
+}
+
+.float-3 {
+  animation-name: float-3;
+  animation-duration: 1500ms;
+}
+
+.float-4 {
+  animation-name: float-4;
+  animation-duration: 1500ms;
 }
 
 @keyframes float-1 {

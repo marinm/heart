@@ -18,7 +18,7 @@ function App() {
   const webSocket = useBroadcastWebSocket();
   const [tapped, setTappedWithTimeout] = useTimeoutState(false, 555);
   const [presentCount, setPresentCount] = useState(0);
-  const [hearts, addHeart] = useTimeoutSet(1500);
+  const [hearts, addHeart] = useTimeoutSet<string>(1500);
 
   const channel =
     new URL(window.location.href).searchParams.get("channel") ?? "";
@@ -70,7 +70,11 @@ function App() {
       <div className="stats-layer">
         <NumberOnline count={presentCount} />
       </div>
-      <div className="small-hearts-layer"></div>
+      <div className="small-hearts-layer">
+        {[...hearts].map((heart) => (
+          <Heart className="small-heart float-1" key={heart} />
+        ))}
+      </div>
     </>
   );
 }
