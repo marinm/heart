@@ -5,7 +5,7 @@ export function useBroadcastWebSocket() {
   const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
   const [isOnline, setIsOnline] = useState<boolean>(window.navigator.onLine);
   const [error, setError] = useState<boolean>(false);
-  const onMessageRef = useRef<(message: unknown) => void>(() => {});
+  const onMessageRef = useRef<(message: object) => void>(() => {});
 
   function reasonError(method: string, reason: string) {
     console.log(`ignoring ${method}() because ${reason}`);
@@ -26,7 +26,11 @@ export function useBroadcastWebSocket() {
     };
 
     websocket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
+      const message = safeJsonParse(event.data);
+      if (message === null) {
+        reasonError("onMessage", "incoming message is not valid JSON object");
+        return;
+      }
       onMessageRef.current(message);
     };
 
@@ -99,7 +103,7 @@ export function useBroadcastWebSocket() {
     };
   }, [close]);
 
-  function onMessage(callback: (message: unknown) => void) {
+  function onMessage(callback: (message: object) => void) {
     onMessageRef.current = callback;
   }
 
@@ -117,6 +121,15 @@ export function useBroadcastWebSocket() {
 function safeJsonStringify(value: unknown): string | null {
   try {
     return JSON.stringify(value);
+  } catch {
+    return null;
+  }
+}
+
+function safeJsonParse(value: unknown): object | null {
+  try {
+    const parsed = JSON.parse(String(value));
+    return typeof parsed === "object" ? parsed : null;
   } catch {
     return null;
   }
