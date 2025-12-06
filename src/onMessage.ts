@@ -1,5 +1,6 @@
 import { ServerMessageSchema } from "./types/ServerMessage";
 import type { ServerMessage } from "./types/ServerMessage";
+import type { HeartInfo } from "./types/HeartInfo";
 
 function parseRawMessage(rawMessage: object): null | ServerMessage {
   try {
@@ -13,11 +14,10 @@ function parseRawMessage(rawMessage: object): null | ServerMessage {
 
 export function onMessage(
   rawMessage: object,
-  addHeart: (value: string) => void,
+  addHeart: (heart: HeartInfo) => void,
   setPresentCount: (value: number) => void,
 ) {
   const message = parseRawMessage(rawMessage);
-  console.log(message);
 
   if (message === null) {
     return;
@@ -26,6 +26,9 @@ export function onMessage(
   if (message.data.present) {
     setPresentCount(message.data.present.length);
   } else {
-    addHeart(message.message_id);
+    addHeart({
+      id: message.message_id,
+      animation: message.data.animation ?? "",
+    });
   }
 }

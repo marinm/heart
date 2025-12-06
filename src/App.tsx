@@ -7,6 +7,7 @@ import { NumberOnline } from "./components/NumberOnline";
 import { Heart } from "./components/Heart";
 import { useTimeoutSet } from "./hooks/useTimeoutSet";
 import { onMessage } from "./onMessage";
+import type { HeartInfo } from "./types/HeartInfo";
 
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
@@ -18,7 +19,7 @@ function App() {
   const webSocket = useBroadcastWebSocket();
   const [tapped, setTappedWithTimeout] = useTimeoutState(false, 555);
   const [presentCount, setPresentCount] = useState(0);
-  const [hearts, addHeart] = useTimeoutSet<string>(1500);
+  const [hearts, addHeart] = useTimeoutSet<HeartInfo>(1500);
 
   const channel =
     new URL(window.location.href).searchParams.get("channel") ?? "";
@@ -30,8 +31,6 @@ function App() {
     },
     [addHeart, setPresentCount],
   );
-
-  useEffect(() => console.log("Hearts:", [...hearts]), [hearts]);
 
   useEffect(
     () => webSocket.onMessage(onMessageCallback),
@@ -71,8 +70,11 @@ function App() {
         <NumberOnline count={presentCount} />
       </div>
       <div className="small-hearts-layer">
-        {[...hearts].map((heart) => (
-          <Heart className="small-heart float-1" key={heart} />
+        {[...hearts].map((heartInfo) => (
+          <Heart
+            className={classNames("small-heart", heartInfo.animation)}
+            key={heartInfo.id}
+          />
         ))}
       </div>
     </>
