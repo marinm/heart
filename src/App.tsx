@@ -4,21 +4,9 @@ import { useBroadcastWebSocket } from "./hooks/useBroadcastWebSocket";
 import { useTimeoutState } from "./hooks/useTimeoutState";
 import classNames from "classnames";
 import { NumberOnline } from "./components/NumberOnline";
-import z from "zod";
 import { Heart } from "./components/Heart";
-
-const ServerMessage = z.object({
-  connection_id: z.string(),
-  broadcast_at: z.string(),
-  from: z.string(),
-  data: z.object({
-    present: z.array(z.string()).optional(),
-    animation: z.string().optional(),
-    timestamp: z.number().optional(),
-  }),
-});
-
-type ServerMessage = z.infer<typeof ServerMessage>;
+import { ServerMessageSchema } from "./types/ServerMessage";
+import type { ServerMessage } from "./types/ServerMessage";
 
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
@@ -28,7 +16,7 @@ function randomAnimation() {
 
 function parseRawMessage(rawMessage: object): null | ServerMessage {
   try {
-    return ServerMessage.parse(rawMessage);
+    return ServerMessageSchema.parse(rawMessage);
   } catch (error) {
     console.error("Bad message", rawMessage);
     console.error(error);
