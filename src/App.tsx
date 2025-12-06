@@ -83,7 +83,7 @@ function App() {
   }
 
   return (
-    <div>
+    <>
       <div>
         <svg
           id="big-heart"
@@ -101,7 +101,7 @@ function App() {
       </div>
       <div className="stats-layer"></div>
       <div className="small-hearts-layer"></div>
-    </div>
+    </>
   );
 }
 
