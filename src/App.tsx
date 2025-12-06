@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useBroadcastWebSocket } from "./hooks/useBroadcastWebSocket";
 import { useTimeoutState } from "./hooks/useTimeoutState";
 import classNames from "classnames";
@@ -38,6 +38,7 @@ function parseRawMessage(rawMessage: object): null | ServerMessage {
 function App() {
   const webSocket = useBroadcastWebSocket();
   const [tapped, setTappedWithTimeout] = useTimeoutState(false, 555);
+  const [presentCount, setPresentCount] = useState(0);
 
   const channel =
     new URL(window.location.href).searchParams.get("channel") ?? "";
@@ -49,6 +50,10 @@ function App() {
 
     if (message === null) {
       return;
+    }
+
+    if (message.data.present) {
+      setPresentCount(message.data.present.length);
     }
 
     // const latency = Date.now() - message.data.timestamp;
@@ -94,7 +99,7 @@ function App() {
         </svg>
       </div>
       <div className="stats-layer">
-        <NumberOnline count={1} />
+        <NumberOnline count={presentCount} />
       </div>
       <div className="small-hearts-layer"></div>
     </>
