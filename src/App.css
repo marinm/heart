@@ -52,7 +52,7 @@
   cursor: default;
 }
 
-#big-heart {
+.big-heart {
   user-select: none;
   font-size: 1in;
   cursor: default;
@@ -64,7 +64,7 @@
     filter 0.5s ease-in;
 }
 
-#big-heart.tapped {
+.big-heart.tapped {
   transform: scale(1.1);
 }
 
