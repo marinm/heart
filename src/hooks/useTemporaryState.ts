@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-export function useTimeoutState<T>(
+export function useTemporaryState<T>(
   initialState: T,
   timeout?: number,
 ): [T, (value: T) => void] {

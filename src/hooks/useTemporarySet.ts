@@ -1,6 +1,10 @@
 import { useState, useRef, useCallback } from "react";
 
-export function useTimeoutSet<T>(
+/**
+ * Creates a set that also returns a setter that temporarily includes the
+ * passed value until the provided timeout
+ */
+export function useTemporarySet<T>(
   timeout: number,
 ): [Set<T>, (value: T) => void] {
   const [values, setValues] = useState<Set<T>>(new Set());

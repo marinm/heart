@@ -1,6 +1,6 @@
 import "./heart.css";
 
-export function Heart(props: { className: string }) {
+export function HeartIcon(props: { className: string }) {
   return (
     <svg
       className={props.className}

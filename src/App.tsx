@@ -1,77 +1,71 @@
 import "./App.css";
 import { useEffect, useCallback, useState } from "react";
 import { useBroadcastWebSocket } from "./hooks/useBroadcastWebSocket";
-import { useTimeoutState } from "./hooks/useTimeoutState";
+import { useTemporaryState } from "./hooks/useTemporaryState";
 import classNames from "classnames";
 import { NumberOnline } from "./components/NumberOnline";
-import { Heart } from "./components/Heart";
-import { useTimeoutSet } from "./hooks/useTimeoutSet";
-import { onMessage } from "./onMessage";
+import { HeartIcon } from "./components/HeartIcon";
+import { useTemporarySet } from "./hooks/useTemporarySet";
+import { handleMessage } from "./onMessage";
 import type { HeartInfo } from "./types/HeartInfo";
-
-const animations = ["float-1", "float-2", "float-3", "float-4"];
-
-function randomAnimation() {
-  return animations[Math.floor(Math.random() * animations.length)];
-}
+import { getServerUrl } from "./config/url";
+import { randomAnimationName } from "./constants/animations";
 
 function App() {
   const webSocket = useBroadcastWebSocket();
-  const [tapped, setTappedWithTimeout] = useTimeoutState(false, 555);
-  const [presentCount, setPresentCount] = useState(0);
-  const [hearts, addHeart] = useTimeoutSet<HeartInfo>(1500);
+  const [isTapped, setIsTappedTemporariy] = useTemporaryState(false, 555);
+  const [onlineUserCount, setOnlineUserCount] = useState(0);
+  const [hearts, addHeartTemporarily] = useTemporarySet<HeartInfo>(1500);
 
-  const channel =
-    new URL(window.location.href).searchParams.get("channel") ?? "hearts";
-  const SERVER_URL = `http://localhost:3001/broadcast?channel=${channel}`;
+  const serverUrl = getServerUrl();
 
-  const onMessageCallback = useCallback(
+  const onMessage = useCallback(
     (rawMessage: object) => {
-      onMessage(rawMessage, addHeart, setPresentCount);
+      handleMessage(rawMessage, addHeartTemporarily, setOnlineUserCount);
     },
-    [addHeart, setPresentCount],
+    [addHeartTemporarily, setOnlineUserCount],
   );
 
-  useEffect(
-    () => webSocket.onMessage(onMessageCallback),
-    [webSocket, onMessageCallback],
-  );
+  const tap = () => {
+    setIsTappedTemporariy(true);
 
-  useEffect(() => webSocket.open(SERVER_URL), [webSocket, SERVER_URL]);
-
-  function tap() {
-    setTappedWithTimeout(true);
-
-    if (webSocket.readyState == WebSocket.CLOSED) {
-      webSocket.open(SERVER_URL);
-      return;
+    switch (webSocket.readyState) {
+      case WebSocket.CLOSED: {
+        webSocket.open(serverUrl);
+        return;
+      }
+      case WebSocket.OPEN: {
+        webSocket.send({
+          data: { timestamp: Date.now(), animation: randomAnimationName() },
+        });
+      }
     }
+  };
 
-    if (webSocket.readyState !== WebSocket.OPEN) {
-      return;
-    }
+  useEffect(() => {
+    webSocket.onMessage(onMessage);
+  }, [webSocket, onMessage]);
 
-    webSocket.send({
-      data: { timestamp: Date.now(), animation: randomAnimation() },
-    });
-  }
+  useEffect(() => {
+    webSocket.open(serverUrl);
+  }, [webSocket, serverUrl]);
 
   return (
     <>
       <div onClick={tap}>
-        <Heart
+        <HeartIcon
           className={classNames("big-heart", {
             grayscale: webSocket.readyState !== WebSocket.OPEN,
-            tapped: tapped,
+            tapped: isTapped,
           })}
         />
       </div>
       <div className="stats-layer">
-        <NumberOnline count={presentCount} />
+        <NumberOnline count={onlineUserCount} />
       </div>
       <div className="small-hearts-layer">
         {[...hearts].map((heartInfo) => (
-          <Heart
+          <HeartIcon
             className={classNames("small-heart", heartInfo.animation)}
             key={heartInfo.id}
           />

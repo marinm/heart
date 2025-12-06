@@ -3,35 +3,36 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export function useBroadcastWebSocket() {
   const websocketRef = useRef<null | WebSocket>(null);
   const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
-  const [isOnline, setIsOnline] = useState<boolean>(window.navigator.onLine);
-  const [error, setError] = useState<boolean>(false);
-  const onMessageRef = useRef<(message: object) => void>(() => {});
+  const [isOnline, setIsOnline] = useState(window.navigator.onLine);
+  const [hasError, setHasError] = useState(false);
+  const onMessageRef = useRef<(message: object) => void | null>(null);
 
-  function reasonError(method: string, reason: string) {
-    console.log(`ignoring ${method}() because ${reason}`);
-  }
+  const onMessage = (callback: (message: object) => void) => {
+    onMessageRef.current = callback;
+  };
 
   const open = useCallback((url: string) => {
     if (websocketRef.current !== null) {
-      reasonError("open", "already open");
+      console.error("Websocket already open");
       return;
     }
-    websocketRef.current = new WebSocket(url);
 
-    const websocket = websocketRef.current;
+    const websocket = new WebSocket(url);
+
+    websocketRef.current = websocket;
 
     websocket.onopen = () => {
       setReadyState(websocket.readyState);
-      setError(false);
+      setHasError(false);
     };
 
     websocket.onmessage = (event) => {
       const message = safeJsonParse(event.data);
       if (message === null) {
-        reasonError("onMessage", "incoming message is not valid JSON object");
+        console.error("Incoming message is not a valid JSON object");
         return;
       }
-      onMessageRef.current(message);
+      onMessageRef.current?.(message);
     };
 
     websocket.onclose = () => {
@@ -41,52 +42,33 @@ export function useBroadcastWebSocket() {
 
     websocket.onerror = (err) => {
       console.error(err);
-      setError(true);
+      setHasError(true);
     };
   }, []);
 
   const send = useCallback((message: unknown) => {
-    if (websocketRef.current === null) {
-      reasonError("send", "closed");
+    if (websocketRef.current?.readyState != WebSocket.OPEN) {
+      console.error("Cannot send because the connection is closed");
       return;
     }
-    if (websocketRef.current.readyState != WebSocket.OPEN) {
-      reasonError("send", "closed");
-      return;
-    }
+
     const stringified = safeJsonStringify(message);
     if (stringified === null) {
-      reasonError("send", "message cannot be stringified");
+      console.error("Cannot send because message cannot be stringified");
       return;
     }
     websocketRef.current.send(stringified);
   }, []);
 
   const close = useCallback(() => {
-    if (websocketRef.current === null) {
-      reasonError("close", "already closed");
-      return;
+    if (!websocketRef.current) {
+      logError("close", "already closed"); // TODO: CHANGE
+      return false;
     }
 
-    if (
-      websocketRef.current.readyState === WebSocket.CLOSING ||
-      websocketRef.current.readyState === WebSocket.CLOSED
-    ) {
-      reasonError("close", "already closed");
-      return;
-    }
-
-    if (websocketRef.current.readyState === WebSocket.CONNECTING) {
-      reasonError("close", "connecting in progress");
-      return;
-    }
-
-    if (websocketRef.current.readyState === WebSocket.OPEN) {
+    if (canWebsocketBeClosed(websocketRef.current)) {
       websocketRef.current.close();
-      return;
     }
-
-    reasonError("close", "uncaught readyState");
   }, []);
 
   useEffect(() => {
@@ -97,25 +79,30 @@ export function useBroadcastWebSocket() {
     window.addEventListener("offline", onOffline);
 
     return () => {
-      close();
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
     };
-  }, [close]);
+  }, []);
 
-  function onMessage(callback: (message: object) => void) {
-    onMessageRef.current = callback;
-  }
+  useEffect(() => {
+    return () => {
+      close();
+    };
+  }, [close]);
 
   return {
     isOnline,
     readyState,
-    error,
+    error: hasError,
     open,
     send,
     close,
     onMessage,
   };
+}
+
+function logError(method: string, reason: string) {
+  console.error(`ignoring ${method}() because ${reason}`);
 }
 
 function safeJsonStringify(value: unknown): string | null {
@@ -132,5 +119,26 @@ function safeJsonParse(value: unknown): object | null {
     return typeof parsed === "object" ? parsed : null;
   } catch {
     return null;
+  }
+}
+
+function canWebsocketBeClosed(websocket: WebSocket): boolean {
+  switch (websocket.readyState) {
+    case WebSocket.CLOSING:
+    case WebSocket.CLOSED: {
+      logError("close", "already closed"); // TODO: CHANGE
+      return false;
+    }
+    case WebSocket.CONNECTING: {
+      logError("close", "connecting in progress"); // TODO: CHANGE
+      return false;
+    }
+    case WebSocket.OPEN: {
+      return true;
+    }
+    default: {
+      logError("close", "uncaught readyState"); // TODO: CHANGE
+      return false;
+    }
   }
 }
