@@ -4,14 +4,20 @@ import { useBroadcastWebSocket } from "./hooks/useBroadcastWebSocket";
 import { useTimeoutState } from "./hooks/useTimeoutState";
 import classNames from "classnames";
 import { NumberOnline } from "./components/NumberOnline";
+import z from "zod";
 
-type ServerMessage = {
-  from: string;
-  data: {
-    timestamp: number;
-    animation: string;
-  };
-};
+const ServerMessage = z.object({
+  connection_id: z.string(),
+  broadcast_at: z.string(),
+  from: z.string(),
+  data: z.object({
+    present: z.array(z.string()).optional(),
+    animation: z.string().optional(),
+    timestamp: z.number().optional(),
+  }),
+});
+
+type ServerMessage = z.infer<typeof ServerMessage>;
 
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
@@ -19,31 +25,14 @@ function randomAnimation() {
   return animations[Math.floor(Math.random() * animations.length)];
 }
 
-function parseRawMessage(rawMessage: unknown): null | ServerMessage {
-  let message = null;
+function parseRawMessage(rawMessage: object): null | ServerMessage {
   try {
-    message = JSON.parse(String(rawMessage));
-  } catch {
-    message = null;
+    return ServerMessage.parse(rawMessage);
+  } catch (error) {
+    console.error("Bad message", rawMessage);
+    console.error(error);
+    return null;
   }
-
-  if (
-    message !== null &&
-    typeof message === "object" &&
-    "from" in message &&
-    typeof message.from === "string" &&
-    "data" in message &&
-    typeof message.data === "object" &&
-    "timestamp" in message.data &&
-    typeof message.data.timestamp === "number" &&
-    "animation" in message.data &&
-    typeof message.data.animation === "string" &&
-    animations.includes(message.data.animation)
-  ) {
-    return message;
-  }
-
-  return null;
 }
 
 function App() {
@@ -54,9 +43,13 @@ function App() {
     new URL(window.location.href).searchParams.get("channel") ?? "";
   const SERVER_URL = `http://localhost:3001/broadcast?channel=${channel}`;
 
-  const onMessage = useCallback((rawMessage: unknown) => {
+  const onMessage = useCallback((rawMessage: object) => {
     const message = parseRawMessage(rawMessage);
     console.log(message);
+
+    if (message === null) {
+      return;
+    }
 
     // const latency = Date.now() - message.data.timestamp;
     // newHeart(animationName, latency);
