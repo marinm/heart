@@ -1,0 +1,116 @@
+.small-heart {
+  user-select: none;
+  position: absolute;
+  animation-fill-mode: forwards;
+  font-size: 0.5in;
+  line-height: 0.5in;
+  fill: red;
+  width: 0.5in;
+  cursor: default;
+}
+
+.big-heart {
+  user-select: none;
+  font-size: 1in;
+  cursor: default;
+  line-height: 1in;
+  width: 1in;
+  fill: red;
+  transition:
+    transform 0.25s linear,
+    filter 0.5s ease-in;
+}
+
+.big-heart.tapped {
+  transform: scale(1.1);
+}
+
+.grayscale {
+  filter: grayscale(1);
+}
+
+@keyframes grow {
+  0% {
+    scale: 1;
+  }
+
+  50% {
+    scale: 1.3;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes float-1 {
+  0% {
+    scale: 0.2;
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    translate: 20mm -50mm;
+    rotate: 15deg;
+    scale: 1;
+    opacity: 0;
+  }
+}
+
+@keyframes float-2 {
+  0% {
+    scale: 0.3;
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    translate: -10mm -70mm;
+    rotate: -10deg;
+    scale: 1;
+    opacity: 0;
+  }
+}
+
+@keyframes float-3 {
+  0% {
+    scale: 0.4;
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  100% {
+    translate: -10mm -90mm;
+    rotate: -20deg;
+    scale: 0.8;
+    opacity: 0;
+  }
+}
+
+@keyframes float-4 {
+  0% {
+    scale: 0.4;
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  100% {
+    translate: 15mm -110mm;
+    rotate: 30deg;
+    scale: 0.7;
+    opacity: 0;
+  }
+}

@@ -1,3 +1,5 @@
+import "./heart.css";
+
 export function Heart(props: { className: string }) {
   return (
     <svg
