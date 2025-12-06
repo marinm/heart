@@ -13,6 +13,8 @@ import { randomAnimationName } from "./constants/animations";
 
 function App() {
   const webSocket = useBroadcastWebSocket();
+  const { open } = webSocket;
+
   const [isTapped, setIsTappedTemporariy] = useTemporaryState(false, 555);
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [hearts, addHeartTemporarily] = useTemporarySet<HeartInfo>(1500);
@@ -47,8 +49,8 @@ function App() {
   }, [webSocket, onMessage]);
 
   useEffect(() => {
-    webSocket.open(serverUrl);
-  }, [webSocket, serverUrl]);
+    open(serverUrl);
+  }, [open, serverUrl]);
 
   return (
     <>
