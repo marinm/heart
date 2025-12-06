@@ -7,6 +7,7 @@ import { NumberOnline } from "./components/NumberOnline";
 import { Heart } from "./components/Heart";
 import { ServerMessageSchema } from "./types/ServerMessage";
 import type { ServerMessage } from "./types/ServerMessage";
+import { useTimeoutSet } from "./hooks/useTimeoutSet";
 
 const animations = ["float-1", "float-2", "float-3", "float-4"];
 
@@ -28,26 +29,34 @@ function App() {
   const webSocket = useBroadcastWebSocket();
   const [tapped, setTappedWithTimeout] = useTimeoutState(false, 555);
   const [presentCount, setPresentCount] = useState(0);
+  const [hearts, addHeart] = useTimeoutSet(1500);
 
   const channel =
     new URL(window.location.href).searchParams.get("channel") ?? "";
   const SERVER_URL = `http://localhost:3001/broadcast?channel=${channel}`;
 
-  const onMessage = useCallback((rawMessage: object) => {
-    const message = parseRawMessage(rawMessage);
-    console.log(message);
+  const onMessage = useCallback(
+    (rawMessage: object) => {
+      const message = parseRawMessage(rawMessage);
+      console.log(message);
 
-    if (message === null) {
-      return;
-    }
+      if (message === null) {
+        return;
+      }
 
-    if (message.data.present) {
-      setPresentCount(message.data.present.length);
-    }
+      if (message.data.present) {
+        setPresentCount(message.data.present.length);
+      } else {
+        addHeart(message.message_id);
+      }
 
-    // const latency = Date.now() - message.data.timestamp;
-    // newHeart(animationName, latency);
-  }, []);
+      // const latency = Date.now() - message.data.timestamp;
+      // newHeart(animationName, latency);
+    },
+    [addHeart],
+  );
+
+  useEffect(() => console.log("Hearts:", [...hearts]), [hearts]);
 
   useEffect(() => webSocket.onMessage(onMessage), [webSocket, onMessage]);
 
