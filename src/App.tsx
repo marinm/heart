@@ -22,7 +22,7 @@ function App() {
   const [hearts, addHeart] = useTimeoutSet<HeartInfo>(1500);
 
   const channel =
-    new URL(window.location.href).searchParams.get("channel") ?? "";
+    new URL(window.location.href).searchParams.get("channel") ?? "hearts";
   const SERVER_URL = `http://localhost:3001/broadcast?channel=${channel}`;
 
   const onMessageCallback = useCallback(
