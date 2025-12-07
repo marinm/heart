@@ -1,4 +1,4 @@
-import "./heart.css";
+import "./Heart.css";
 
 export function HeartIcon(props: { className: string }) {
   return (
