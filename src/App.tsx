@@ -62,9 +62,11 @@ function App() {
           })}
         />
       </div>
-      <div className="stats-layer">
-        <NumberOnline count={onlineUserCount} />
-      </div>
+      {webSocket.readyState === WebSocket.OPEN && (
+        <div className="stats-layer">
+          <NumberOnline count={onlineUserCount} />
+        </div>
+      )}
       <div className="small-hearts-layer">
         {[...hearts].map((heartInfo) => (
           <HeartIcon
