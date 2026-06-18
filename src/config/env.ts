@@ -1,15 +1,11 @@
 import z from "zod";
 
-const { VITE_PROTOCOL, VITE_HOST, VITE_PORT } = import.meta.env;
+const { VITE_BROADCAST_SERVER_URL } = import.meta.env;
 
 export const env = z
   .object({
-    PROTOCOL: z.union([z.string("http"), z.string("https")]).default("http"),
-    HOST: z.string().default("localhost"),
-    PORT: z.coerce.number().default(3000),
+    BROADCAST_SERVER_URL: z.string(),
   })
   .parse({
-    PROTOCOL: VITE_PROTOCOL,
-    HOST: VITE_HOST,
-    PORT: VITE_PORT,
+    BROADCAST_SERVER_URL: VITE_BROADCAST_SERVER_URL,
   });
